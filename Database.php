@@ -42,10 +42,6 @@ class Database
     
     
     //getRow
-    public function getRow($query, $params = [])
-    {
-        return $this->getSTMT($query, $params)->fetch();
-    }
     
     
     
