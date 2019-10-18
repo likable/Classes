@@ -39,18 +39,23 @@ class Database
         return $stmt;
     }
     
-    
-    
     //getRow
-    
-    
+    public function getRow($query, $params = [])
+    {
+        return $this->getSTMT($query, $params)->fetch();
+    }
     
     //getRows
-    
-    
+    public function getRows($query, $params = [])
+    {
+        return $this->getSTMT($query, $params)->fetchAll();
+    }
     
     //getColumn
-    
+    public function getColumn($query, $params = [])
+    {
+        return $this->getSTMT($query, $params)->fetchAll(PDO::FETCH_COLUMN);
+    }
     
     
     //insert
