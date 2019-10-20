@@ -57,23 +57,40 @@ class Database
         return $this->getSTMT($query, $params)->fetchAll(PDO::FETCH_COLUMN);
     }
     
-    
     //insert
-    
-    
+    public function insert($query, $params = [])
+    {
+        $this->getSTMT($query, $params);
+        return $this;
+    }
     
     //update
-    
-    
+    public function update($query, $params = [])
+    {
+        if (count($params) === 0) {
+            exit("В целях безопасности метод update применяется исключительно с параметрами.");
+        }
+        $this->getSTMT($query, $params);
+        return $this;
+    }
     
     //delete
-    
-    
+    public function delete($query, $params = [])
+    {
+        if (count($params) === 0) {
+            exit("В целях безопасности метод delete применяется исключительно с параметрами.");
+        }
+        $this->getSTMT($query, $params);
+        return $this;
+    }
     
     //lastInsertId
+    public function lastInsertId()
+    {
+        return $this->pdo->lastInsertId();
+    }
     
-    
-    
+
     //numRows
     
     
