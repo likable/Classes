@@ -26,7 +26,13 @@ class Database
         $this->pdo = null;
     }
     
-    //query
+    /**
+     * Подготавливает и выполняет запрос к базе данных, возвращает стэйтмент 
+     * 
+     * @param string $query SQL-запрос
+     * @param array $params Параметры для подготовленного выражения
+     * @return object PDOStatement or FALSE
+     */
     private function getSTMT($query, $params = [])
     {
         $stmt = false;
@@ -39,37 +45,94 @@ class Database
         return $stmt;
     }
     
+    /**
+     * Возвращает результат запроса только для одной строки
+     * 
+     * @param string $query SQL-запрос
+     * @param array $params Параметры для подготовленного выражения
+     * @return array Массив с результатами запроса
+     */
+    public function getRow($query, $params = [])
+    {
+        return $this->getSTMT($query, $params)->fetch();
+    }
     
+    /**
+     * Возвращает полный результат запроса
+     * 
+     * @param string $query SQL-запрос
+     * @param array $params Параметры для подготовленного выражения
+     * @return array Массив с результатами запроса
+     */
+    public function getRows($query, $params = [])
+    {
+        return $this->getSTMT($query, $params)->fetchAll();
+    }
     
-    //getRow
+    /**
+     * Возвращает результат запроса только для одного столбца
+     * 
+     * @param string $query SQL-запрос
+     * @param array $params Параметры для подготовленного выражения
+     * @return array Массив с результатами запроса
+     */
+    public function getColumn($query, $params = [])
+    {
+        return $this->getSTMT($query, $params)->fetchAll(PDO::FETCH_COLUMN);
+    }
     
+    /**
+     * Выполняет запрос на добавление в базу данных новой информации
+     * 
+     * @param string $query SQL-запрос
+     * @param array $params Параметры для подготовленного выражения
+     * @return object Текущий объект
+     */
+    public function insert($query, $params = [])
+    {
+        $this->getSTMT($query, $params);
+        return $this;
+    }
     
+    /**
+     * Выполняет запрос на обновление информации
+     * 
+     * @param string $query SQL-запрос
+     * @param array $params Параметры для подготовленного выражения
+     * @return object Текущий объект
+     */
+    public function update($query, $params = [])
+    {
+        if (count($params) === 0) {
+            exit("В целях безопасности метод update применяется исключительно с параметрами.");
+        }
+        $this->getSTMT($query, $params);
+        return $this;
+    }
     
-    //getRows
+    /**
+     * Выполняет запрос на удаление информации
+     * 
+     * @param string $query SQL-запрос
+     * @param array $params Параметры для подготовленного выражения
+     * @return object Текущий объект
+     */
+    public function delete($query, $params = [])
+    {
+        if (count($params) === 0) {
+            exit("В целях безопасности метод delete применяется исключительно с параметрами.");
+        }
+        $this->getSTMT($query, $params);
+        return $this;
+    }
     
-    
-    
-    //getColumn
-    
-    
-    
-    //insert
-    
-    
-    
-    //update
-    
-    
-    
-    //delete
-    
-    
-    
-    //lastInsertId
-    
-    
-    
-    //numRows
-    
-    
+    /**
+     * Возвращает последний id у добавленных в текущую рабочую сессию данных
+     * 
+     * @return int Последний id или 0, если не было операций INSERT
+     */
+    public function lastInsertId()
+    {
+        return $this->pdo->lastInsertId();
+    }
 }
