@@ -34,12 +34,13 @@ class Parser
         return curl_exec($this->ch);
     }
     
-    
-    
-    
-    
-    //getHeaders
-    
+    public function getHeaders($url)
+    {
+        curl_setopt($this->ch, CURLOPT_URL, $url);
+        curl_setopt($this->ch, CURLOPT_HEADER, true);
+        curl_setopt($this->ch, CURLOPT_NOBODY, true);
+        return curl_exec($this->ch);
+    }
     
     
     
