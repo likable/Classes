@@ -9,27 +9,25 @@ class Parser
     private $cookie_path;
     private $user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36";
     
-    public function __construct(int $timeout = 30) 
+    public function __construct(string $proxy = "", string $proxy_type = "CURLPROXY_HTTP") 
     {
         $this->ch = curl_init();
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 10);
-        curl_setopt($this->ch, CURLOPT_TIMEOUT, $timeout);
+        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 20);
+        curl_setopt($this->ch, CURLOPT_TIMEOUT, 40);
         curl_setopt($this->ch, CURLOPT_USERAGENT, $this->user_agent);
+        
+        if ($proxy !== "") {
+            $this->setopt(CURLOPT_PROXY, $proxy);
+            $this->setopt(CURLOPT_PROXYTYPE, $proxy_type);
+        }
     }
     
     public function __destruct() 
     {
         curl_close($this->ch);
-    }
-    
-    public function setopt($name, $value)
-    {
-        if (!curl_setopt($this->ch, $name, $value)) {
-            die("Setopt {$name} failed!");
-        }
     }
     
     public function getBody(string $url)
@@ -60,6 +58,38 @@ class Parser
         return curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
     }
     
+    public function setopt($name, $value)
+    {
+        if (!curl_setopt($this->ch, $name, $value)) {
+            die("Setopt {$name} failed!");
+        }
+    }
+    
+    public function setPostData($post_data)
+    {
+        //if $post_data is array, content type will be multipart/form-data
+        if (!empty($post_data)) {
+            curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post_data);
+        }
+    }
+    
+    public function setTimeouts(int $connect_timeout = 10, int $timeout = 20)
+    {
+        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, $connect_timeout);
+        curl_setopt($this->ch, CURLOPT_TIMEOUT, $timeout);
+    }
+    
+    public function setUserAgent(string $user_agent)
+    {
+        $this->user_agent = $user_agent;
+        curl_setopt($this->ch, CURLOPT_USERAGENT, $this->user_agent);
+    }
+    
+    public function getUserAgent()
+    {
+        return $this->user_agent;
+    }
+
     private function setCookies(string $url)
     {
         $this->cookie_path = __DIR__ . "/cookies" . time() . ".txt";
@@ -73,9 +103,12 @@ class Parser
         curl_setopt($ch_cookies, CURLOPT_HEADER, true);
         curl_setopt($ch_cookies, CURLOPT_NOBODY, true);
         curl_setopt($ch_cookies, CURLOPT_COOKIESESSION, true);
+        curl_setopt($ch_cookies, CURLOPT_CONNECTTIMEOUT, 20);
+        curl_setopt($ch_cookies, CURLOPT_TIMEOUT, 40);
         curl_setopt($ch_cookies, CURLOPT_USERAGENT, $this->user_agent);
         
         //создание файла с куками
+        file_put_contents($this->cookie_path, "");
         curl_setopt($ch_cookies, CURLOPT_COOKIEJAR, $this->cookie_path);
         curl_exec($ch_cookies);
         curl_close($ch_cookies);
@@ -88,23 +121,4 @@ class Parser
             die("Файл с куками не найден!");
         }
     }
-    
-    public function setUserAgent(string $user_agent)
-    {
-        $this->user_agent = $user_agent;
-        curl_setopt($this->ch, CURLOPT_USERAGENT, $this->user_agent);
-    }
-    
-    public function getUserAgent()
-    {
-        return $this->user_agent;
-    }
-    
-
-    
-    
-    
-    
-    
-    
 }
