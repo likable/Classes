@@ -30,6 +30,12 @@ class Parser
         curl_close($this->ch);
     }
     
+    /**
+     * Возвращает тело запрашиваемого ресурса 
+     * 
+     * @param string $url URL сайта для парсинга данных
+     * @return string Текстовое представление тела сайта
+     */
     public function getBody(string $url)
     {
         curl_setopt($this->ch, CURLOPT_URL, $url);
@@ -43,6 +49,13 @@ class Parser
         return curl_exec($this->ch);
     }
     
+    /**
+     * Возвращает заголовки запрашиваемого ресурса
+     * 
+     * @param string $url URL сайта для парсинга данных
+     * @param bool $follow Делать ли редирект если таковой будет
+     * @return string Заголовки запрашиваемого ресурса
+     */
     public function getHeaders(string $url, bool $follow = true)
     {
         curl_setopt($this->ch, CURLOPT_URL, $url);
@@ -52,12 +65,25 @@ class Parser
         return curl_exec($this->ch);
     }
     
+    /**
+     * Возвращает код ответа ресурса
+     * 
+     * @param string $url URL сайта для парсинга данных
+     * @param bool $follow Делать ли редирект если таковой будет
+     * @return int Код ответа ресурса
+     */
     public function getStatusCode(string $url, bool $follow = false)
     {
         $this->getHeaders($url, $follow);
         return curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
     }
     
+    /**
+     * Установка опций cURL
+     * 
+     * @param string $name Название опции
+     * @param string $value Значение опции
+     */
     public function setopt($name, $value)
     {
         if (!curl_setopt($this->ch, $name, $value)) {
@@ -65,6 +91,11 @@ class Parser
         }
     }
     
+    /**
+     * Установка значений отправляемых POST-данных
+     * 
+     * @param array $post_data POST-данные в формате ассоциативного массива
+     */
     public function setPostData($post_data)
     {
         //if $post_data is array, content type will be multipart/form-data
@@ -73,23 +104,44 @@ class Parser
         }
     }
     
+    /**
+     * Установка таймаутов cURL
+     * 
+     * @param int $connect_timeout Таймаут соединения с ресурсом
+     * @param int $timeout Таймаут на выполнение действий с ресурсом
+     */
     public function setTimeouts(int $connect_timeout = 10, int $timeout = 20)
     {
         curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, $connect_timeout);
         curl_setopt($this->ch, CURLOPT_TIMEOUT, $timeout);
     }
     
+    /**
+     * Установка User agent
+     * 
+     * @param string $user_agent User agent
+     */
     public function setUserAgent(string $user_agent)
     {
         $this->user_agent = $user_agent;
         curl_setopt($this->ch, CURLOPT_USERAGENT, $this->user_agent);
     }
     
+    /**
+     * Возвращает значение User agent
+     * 
+     * @return string User agent
+     */
     public function getUserAgent()
     {
         return $this->user_agent;
     }
 
+    /**
+     * Установка cookies
+     * 
+     * @param string $url URL сайта для парсинга данных
+     */
     private function setCookies(string $url)
     {
         $this->cookie_path = __DIR__ . "/cookies" . time() . ".txt";
